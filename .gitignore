@@ -1,0 +1,4 @@
+node_modules
+# Criar ou editar .gitignore
+echo "node_modules/" >> .gitignore
+echo ".local-chromium/" >> .gitignore
