@@ -2,24 +2,11 @@
   "name": "chatbot",
   "version": "1.0.0",
   "type": "module",
-  "main": "index.js",
+  "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/app.js",
     "dev": "nodemon src/app.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/contattoGabriel/chatbot-headsystems.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/contattoGabriel/chatbot-headsystems/issues"
-  },
-  "homepage": "https://github.com/contattoGabriel/chatbot-headsystems#readme",
-  "description": "",
   "dependencies": {
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
