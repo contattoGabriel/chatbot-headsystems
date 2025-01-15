@@ -1,7 +1,9 @@
 import Sequelize from "sequelize";
 import User from "../models/User.js";
 import Chat from "../models/Chat.js";
-require("dotenv").config();
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const sequelize = new Sequelize({
   dialect: "postgres",
