@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { testConnection } from './config/database';
 import './services/whatsapp/connection';
+import chatRouter from './routes/chatRouter.js';
 
 // Configuração do dotenv
 dotenv.config();
@@ -18,6 +19,9 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
   res.json({ message: 'Chatbot API está funcionando!' });
 });
+
+// Adicione antes do middleware de erro
+app.use('/api/chat', chatRouter);
 
 // Tratamento de erros global
 app.use((err, req, res, next) => {
