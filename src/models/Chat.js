@@ -1,27 +1,37 @@
-import { DataTypes } from "sequelize";
-const { sequelize } = require("../config/database");
+import { DataTypes, Model } from "sequelize";
+import { sequelize } from "../config/database.js";
 
-const Chat = sequelize.define("Chat", {
+class Chat extends Model {}
+
+Chat.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    autoIncrement: true,
+    autoIncrement: true
   },
   userId: {
     type: DataTypes.INTEGER,
-    references: {
-      model: "Users",
-      key: "id",
-    },
+    allowNull: false
+  },
+  message: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  response: {
+    type: DataTypes.TEXT,
+    allowNull: false
   },
   status: {
     type: DataTypes.ENUM("active", "closed"),
-    defaultValue: "active",
+    defaultValue: "active"
   },
   context: {
     type: DataTypes.JSON,
-    defaultValue: {},
-  },
+    defaultValue: {}
+  }
+}, {
+  sequelize,
+  modelName: 'Chat'
 });
 
-module.exports = Chat;
+export default Chat;

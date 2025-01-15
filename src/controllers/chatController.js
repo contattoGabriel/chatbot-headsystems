@@ -1,6 +1,6 @@
-import AIService from "../services/ai/openai";
-const User = require("../models/User");
-const Chat = require("../models/Chat");
+import AIService from "../services/ai/openai.js";
+import User from "../models/User.js";
+import Chat from "../models/Chat.js";
 
 class ChatController {
   async processMessage(message) {
@@ -8,7 +8,7 @@ class ChatController {
       // Encontrar ou criar usuário
       const [user] = await User.findOrCreate({
         where: { phoneNumber: message.from },
-        defaults: { name: "Unknown" },
+        defaults: { name: "Unknown" }
       });
 
       // Processar mensagem com IA
@@ -18,7 +18,7 @@ class ChatController {
       await Chat.create({
         userId: user.id,
         message: message.body,
-        response: aiResponse,
+        response: aiResponse
       });
 
       return aiResponse;
@@ -29,4 +29,4 @@ class ChatController {
   }
 }
 
-module.exports = new ChatController();
+export default new ChatController();

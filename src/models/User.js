@@ -1,25 +1,30 @@
-import { DataTypes } from "sequelize";
-const { sequelize } = require("../config/database");
+import { DataTypes, Model } from "sequelize";
+import { sequelize } from "../config/database.js";
 
-const User = sequelize.define("User", {
+class User extends Model {}
+
+User.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    autoIncrement: true,
+    autoIncrement: true
   },
   phoneNumber: {
     type: DataTypes.STRING,
     unique: true,
-    allowNull: false,
+    allowNull: false
   },
   name: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: true
   },
   lastInteraction: {
     type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  },
+    defaultValue: DataTypes.NOW
+  }
+}, {
+  sequelize,
+  modelName: 'User'
 });
 
-module.exports = User;
+export default User;

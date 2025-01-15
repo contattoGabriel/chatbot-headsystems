@@ -1,4 +1,6 @@
 import Sequelize from "sequelize";
+import User from "../models/User.js";
+import Chat from "../models/Chat.js";
 require("dotenv").config();
 
 const sequelize = new Sequelize({
@@ -7,17 +9,36 @@ const sequelize = new Sequelize({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  logging: false, // Define como true para ver as queries SQL
+  logging: false
 });
+
+// Inicializar modelos
+const models = [User, Chat];
+models.forEach(model => model.init(sequelize));
+
+// Associações entre modelos
+User.hasMany(Chat);
+Chat.belongsTo(User);
+
+// Função para sincronizar o banco
+async function syncDatabase() {
+  try {
+    await sequelize.sync({ alter: true });
+    console.log('Tabelas sincronizadas com sucesso');
+  } catch (error) {
+    console.error('Erro ao sincronizar tabelas:', error);
+  }
+}
 
 // Testar conexão
 async function testConnection() {
   try {
     await sequelize.authenticate();
     console.log("Conexão com banco de dados estabelecida.");
+    await syncDatabase();
   } catch (error) {
     console.error("Erro ao conectar ao banco:", error);
   }
 }
 
-module.exports = { sequelize, testConnection };
+export { sequelize, testConnection };

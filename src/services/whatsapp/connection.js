@@ -1,48 +1,30 @@
-import { Client, LocalAuth } from "whatsapp-web.js";
-const qrcode = require("qrcode-terminal");
+import { Client } from 'whatsapp-web.js';
+import chatController from '../../controllers/chatController.js';
 
-class WhatsAppService {
-  constructor() {
-    this.client = new Client({
-      authStrategy: new LocalAuth(),
-      puppeteer: {
-        headless: true,
-        args: ["--no-sandbox"],
-      },
-    });
+const client = new Client({
+    puppeteer: {
+        args: ['--no-sandbox']
+    }
+});
 
-    this.initializeClient();
-  }
+client.on('qr', (qr) => {
+    console.log('QR RECEIVED', qr);
+});
 
-  initializeClient() {
-    // Evento de QR Code
-    this.client.on("qr", (qr) => {
-      console.log("QR Code recebido, escaneie-o no WhatsApp:");
-      qrcode.generate(qr, { small: true });
-    });
+client.on('ready', () => {
+    console.log('Cliente WhatsApp está pronto!');
+});
 
-    // Evento de pronto
-    this.client.on("ready", () => {
-      console.log("Cliente WhatsApp está pronto!");
-    });
+client.on('message', async (message) => {
+    try {
+        const response = await chatController.processMessage(message);
+        message.reply(response);
+    } catch (error) {
+        console.error('Erro ao processar mensagem:', error);
+        message.reply('Desculpe, ocorreu um erro ao processar sua mensagem.');
+    }
+});
 
-    // Evento de mensagem
-    this.client.on("message", async (message) => {
-      try {
-        await this.handleMessage(message);
-      } catch (error) {
-        console.error("Erro ao processar mensagem:", error);
-      }
-    });
+client.initialize();
 
-    // Inicializar cliente
-    this.client.initialize();
-  }
-
-  async handleMessage(message) {
-    // Implementação do processamento de mensagem
-    console.log("Mensagem recebida:", message.body);
-  }
-}
-
-module.exports = new WhatsAppService();
+export default client;
