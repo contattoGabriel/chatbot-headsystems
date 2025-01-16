@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../config/database.js";
+import Chat from "./Chat.js";
 
 class User extends Model {}
 
@@ -11,12 +12,12 @@ User.init({
   },
   phoneNumber: {
     type: DataTypes.STRING,
-    unique: true,
-    allowNull: false
+    allowNull: false,
+    unique: true
   },
   name: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: false
   },
   lastInteraction: {
     type: DataTypes.DATE,
@@ -24,7 +25,11 @@ User.init({
   }
 }, {
   sequelize,
-  modelName: 'User'
+  modelName: 'User',
+  tableName: 'users'
 });
+
+User.hasMany(Chat);
+Chat.belongsTo(User);
 
 export default User;

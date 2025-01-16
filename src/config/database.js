@@ -23,4 +23,14 @@ async function testConnection() {
   }
 }
 
-export { sequelize, testConnection };
+// Adicionar função para sincronizar modelos
+async function syncModels() {
+  try {
+    await sequelize.sync();
+    console.log('Modelos sincronizados com o banco de dados.');
+  } catch (error) {
+    console.error('Erro ao sincronizar modelos:', error);
+  }
+}
+
+export { sequelize, testConnection, syncModels };
