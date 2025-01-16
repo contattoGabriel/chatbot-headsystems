@@ -11,7 +11,6 @@ router.get('/qr', (req, res) => {
         return res.status(404).json({ message: 'QR Code ainda não está disponível' });
     }
 
-    // Gerar imagem do QR code
     const qr_png = qr.image(qrCode, { type: 'png' });
     res.setHeader('Content-Type', 'image/png');
     qr_png.pipe(res);

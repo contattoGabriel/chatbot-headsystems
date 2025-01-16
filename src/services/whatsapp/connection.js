@@ -1,44 +1,43 @@
-import { Client } from 'whatsapp-web.js';
-import chatController from '../../controllers/chatController.js';
+import { create } from 'venom-bot';
+import SimpleAI from '../ai/simpleAI.js';
 
-const client = new Client({
-    puppeteer: {
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+let qrCodeData = null;
+
+const venombot = create({
+    session: 'head-systems-bot',
+    multidevice: true,
+    headless: true,
+    qrTimeout: 60,
+    qrQuality: 1,
+    createPathFileToken: true,
+    catchQR: (base64Qr) => {
+        qrCodeData = base64Qr;
     }
+})
+.then((client) => {
+    console.log('Bot iniciado com sucesso!');
+
+    client.onMessage(async (message) => {
+        if (!message.isGroupMsg) {
+            try {
+                const response = SimpleAI.processMessage(message.body);
+                
+                // Delay para parecer mais natural
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await client.sendText(message.from, response);
+                
+            } catch (error) {
+                console.error('Erro ao processar mensagem:', error);
+                await client.sendText(message.from, 
+                    'Desculpe, ocorreu um erro. Por favor, tente novamente ou entre em contato pelo telefone +55 31 3772-0172');
+            }
+        }
+    });
+})
+.catch((error) => {
+    console.error('Erro ao criar cliente:', error);
 });
 
-let qrCode = null;
-
-client.on('qr', (qr) => {
-    qrCode = qr;
-    console.log('QR Code recebido');
-});
-
-client.on('ready', () => {
-    console.log('WhatsApp está conectado e pronto para receber mensagens!');
-});
-
-client.on('message', async (message) => {
-    console.log('Nova mensagem recebida:', message.body);
-    try {
-        const response = await chatController.processMessage(message);
-        console.log('Resposta gerada:', response);
-        await message.reply(response);
-        console.log('Resposta enviada com sucesso');
-    } catch (error) {
-        console.error('Erro ao processar mensagem:', error);
-        await message.reply('Olá, no momento Gabriel não está disponível para conversar, mas você pode deixar uma mensagem que ele verá assim que possível.');
-    }
-});
-
-client.on('disconnected', (reason) => {
-    console.log('Cliente WhatsApp desconectado:', reason);
-});
-
-client.initialize().catch(err => {
-    console.error('Erro ao inicializar cliente:', err);
-});
-
-export const getQRCode = () => qrCode;
-export default client;
+export const getQRCode = () => qrCodeData;
 
