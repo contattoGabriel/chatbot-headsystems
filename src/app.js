@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { testConnection } from './config/database.js';
+import whatsappRouter from './routes/whatsappRouter.js';
 
 // Configuração do dotenv
 dotenv.config();
@@ -11,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 
 // Middlewares
 app.use(express.json());
+app.use('/whatsapp', whatsappRouter);
 
 // Rota básica para teste
 app.get('/', (req, res) => {

@@ -5,14 +5,18 @@ import Chat from "../models/Chat.js";
 class ChatController {
   async processMessage(message) {
     try {
+      console.log('Mensagem recebida:', message.body);
+      
       // Encontrar ou criar usuário
       const [user] = await User.findOrCreate({
         where: { phoneNumber: message.from },
         defaults: { name: "Unknown" }
       });
+      console.log('Usuário:', user.phoneNumber);
 
       // Processar mensagem com IA
       const aiResponse = await AIService.processMessage(message.body);
+      console.log('Resposta da IA:', aiResponse);
 
       // Salvar conversa
       await Chat.create({
