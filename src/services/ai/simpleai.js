@@ -39,8 +39,8 @@ class SimpleAI {
         contato: {
             patterns: ['contato', 'telefone', 'email', 'endereço', 'localização', 'onde', 'falar', 'atendimento'],
             replies: [
-                'Você pode nos contatar:\nTelefone: +55 31 3772-0172\nE-mail: contato@headsystems.com.br\nEndereço: Rua João Alves Ferreira, 322, Esmeraldas, Sete Lagoas - MG',
-                'Estamos disponíveis para atendê-lo:\nTel: +55 31 3772-0172\nE-mail: contato@headsystems.com.br'
+                'Você pode nos contatar:\nTelefone: +55 31 3772-0172\nSite:https://headsystems.com.br/\nEndereço: Rua João Alves Ferreira, 322, Esmeraldas, Sete Lagoas - MG',
+                'Estamos disponíveis para atendê-lo:\nTel: +55 31 3772-0172\nSite:https://headsystems.com.br/'
             ]
         },
         despedida: {
@@ -59,7 +59,7 @@ class SimpleAI {
             ]
         },
         especialista: {
-            patterns: ['falar', 'atendimento', 'especialista', 'consultor', 'consultoria', 'suporte', 'help desk', 'monitoramento'],
+            patterns: ['falar', 'atendimento', 'especialista', 'consultor', 'consultoria', 'suporte', 'help desk', 'monitoramento', 'especialista', 'analista'],
             replies: [
                 'Para falar com um especialista, entre em contato pelo telefone (31) 3772-0172 ou email contato@headsystems.com.br',
                 'Vamos agendar uma conversa para entender suas necessidades? Entre em contato: (31) 3772-0172'
@@ -86,11 +86,12 @@ class SimpleAI {
         }
 
         // Resposta padrão se nenhum padrão for encontrado
-        return 'Olá! Sou o assistente virtual da Head Systems. Posso ajudar com informações sobre:\n\n' +
+        return 'Olá! Sou o assistente virtual da Head Systems. Posso ajudar com informações sobre, Digite o que você precisa:\n\n' +
                '- Outsourcing de TI\n' +
                '- Virtualização\n' +
                '- Segurança da informação\n' +
-               '- Orçamentos\n\n' +
+               '- Orçamentos\n' +
+               '- Fale com um especialista\n' +
                'Como posso te ajudar hoje?';
     }
 }
