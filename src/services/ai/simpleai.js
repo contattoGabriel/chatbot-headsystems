@@ -39,8 +39,8 @@ class SimpleAI {
         contato: {
             patterns: ['contato', 'telefone', 'email', 'endereço', 'localização', 'onde', 'falar', 'atendimento'],
             replies: [
-                'Você pode nos contatar:\nTelefone: +55 31 3772-0172\nSite:https://headsystems.com.br/\nEndereço: Rua João Alves Ferreira, 322, Esmeraldas, Sete Lagoas - MG',
-                'Estamos disponíveis para atendê-lo:\nTel: +55 31 3772-0172\nSite:https://headsystems.com.br/'
+                'Você pode nos contatar:\nTelefone: +55 31 3772-0172\nE-mail:contato@headsystems.com.br/\nSite:https://headsystems.com.br/',
+                'Estamos disponíveis para atendê-lo:\nTel: +55 31 3772-0172\nE-mail:contato@headsystems.com.br'
             ]
         },
         despedida: {
