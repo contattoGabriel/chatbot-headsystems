@@ -12,7 +12,17 @@ const PORT = process.env.PORT || 3000;
 
 // Middlewares
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use('/whatsapp', whatsappRouter);
+
+// Adiciona tratamento de erros global
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({
+        status: 'error',
+        message: 'Algo deu errado! Por favor, tente novamente mais tarde.'
+    });
+});
 
 // Rota básica para teste
 app.get('/', (req, res) => {
