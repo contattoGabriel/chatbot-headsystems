@@ -1,5 +1,5 @@
 import { create } from 'venom-bot';
-import SimpleAI from '../ai/simpleAI.js';
+import SimpleAI from '../ai/simpleai.js';
 
 let qrCodeData = null;
 

@@ -8,7 +8,7 @@ class SimpleAI {
                 "Como posso ajudar? 😊\n\n" +
                 "1️⃣ 👨‍💼 Falar com um Especialista\n" +
                 "2️⃣ 🔍 Conhecer Nossos Serviços\n",
-        options: ['1', '2', ]
+        options: ['1', '2']
     };
 
     static responses = {
@@ -24,8 +24,8 @@ class SimpleAI {
                     "• 🛡️ Firewall e Backup\n" +
                     "• 📋 Conformidade LGPD\n\n" +
                     "1️⃣ 👨‍💼 Falar com um Especialista\n" +
-                    "3 🏠 Voltar ao Menu Principal",
-            options: ['1', '2', '3']
+                    "3️⃣ 🏠 Voltar ao Menu Principal",
+            options: ['1', '3']
         }
     };
 
@@ -43,10 +43,10 @@ class SimpleAI {
                    "📞 Você também pode nos contatar diretamente:\n" +
                    "📱 Tel: (31) 3772-0172\n" +
                    "📧 Email: contato@headsystems.com.br\n\n" +
-                   "3 🏠 Voltar ao Menu Principal";
+                   "3️⃣ 🏠 Voltar ao Menu Principal";
         }
 
-        
+        // Opção 2 - Conhecer Nossos Serviços
         if (text === '2') {
             return "🏢 A Head Systems oferece soluções completas em TI 💻\n\n" +
                     "🔹 Outsourcing de TI 👨‍💻\n" +
@@ -59,10 +59,13 @@ class SimpleAI {
                     "• 🛡️ Firewall e Backup\n" +
                     "• 📋 Conformidade LGPD\n\n" +
                     "1️⃣ 👨‍💼 Falar com um Especialista\n" +
-                    "3 🏠 Voltar ao Menu Principal";
+                    "3️⃣ 🏠 Voltar ao Menu Principal";
         }
-        
-        
+
+        // Opção 3 - Voltar ao Menu Principal
+        if (text === '3') {
+            return this.mainMenu.message;
+        }
 
         // Resposta padrão para entradas não reconhecidas
         return "❓ Desculpe, não entendi. 😕\n\n" + this.mainMenu.message;
