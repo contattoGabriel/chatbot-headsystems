@@ -1,6 +1,7 @@
 import { create } from 'venom-bot';
 import SimpleAI from '../ai/simpleai.js';
 
+const ADMIN_NUMBER = '5531999407159@c.us';
 let qrCodeData = null;
 
 create({
@@ -16,44 +17,67 @@ create({
         qrCodeData = base64Qr;
     },
 })
-    .then((client) => {
-        console.log('Bot iniciado com sucesso!');
-
-        const aiInstance = new SimpleAI();
-
-        client.onMessage(async (message) => {
-            if (!message.isGroupMsg) {
-                try {
-                    console.log(`Mensagem recebida: ${message.body}`);
-                    const userInput = message.body.trim();
-                    const response = aiInstance.processMessage(userInput);
-
-                    if (response === "1" || response === "2" || response === "3" || response === "4") {
-                        // Redireciona para o especialista
-                        const specialistNumber = response;
-                        await redirectToSpecialist(client, message, specialistNumber);
-                    } else {
-                        // Envia a resposta padrão do SimpleAI
-                        await client.sendText(message.from, response);
-                    }
-                } catch (error) {
-                    console.error('Erro ao processar mensagem:', error);
-                    await client.sendText(
-                        message.from,
-                        '⚠️ Ocorreu um erro. Por favor, entre em contato pelo telefone (31) 3772-0172.'
-                    );
+.then((client) => {
+    console.log('🚀 Bot iniciado com sucesso!');
+    const aiInstance = new SimpleAI();
+    
+    client.onMessage(async (message) => {
+        if (!message.isGroupMsg) {
+            try {
+                if (!message.body || typeof message.body !== 'string') {
+                    console.log('❌ Mensagem inválida recebida');
+                    return;
                 }
-            }
-        });
-    })
-    .catch((error) => {
-        console.error('Erro ao criar cliente:', error);
-    });
 
-export const getQRCode = () => qrCodeData;
+                console.log(`📩 Mensagem recebida: ${message.body}`);
+                const userInput = message.body.trim();
+
+                if (!userInput) {
+                    console.log('❌ Mensagem vazia recebida');
+                    return;
+                }
+
+                const response = await aiInstance.processMessage(userInput);
+
+                if (aiInstance.awaitingSpecialist) {
+                    await redirectToSpecialist(client, message);
+                    aiInstance.awaitingSpecialist = false;
+                    return;
+                }
+
+                // Update admin notification message
+                if (response.complete && response.meetingDetails) {
+                    await client.sendText(message.from, response.message);
+                    await client.sendText(
+                        ADMIN_NUMBER,
+                        `📅 Novo agendamento de reunião:\n\n` +
+                        `👤 Nome: ${response.meetingDetails.name}\n` +
+                        `📆 Data: ${response.meetingDetails.date}\n` +
+                        `⏰ Hora: ${response.meetingDetails.time}\n` +
+                        `📧 E-mail: ${response.meetingDetails.email}\n` +
+                        `📝 Assunto: ${response.meetingDetails.subject}\n` +
+                        `📞 Número do cliente: ${message.from.replace('@c.us', '')}`
+                    );
+                } else {
+                    await client.sendText(message.from, response.message);
+                }
+            } catch (error) {
+                console.error('❌ Erro ao processar mensagem:', error);
+                await client.sendText(
+                    message.from,
+                    '⚠️ Ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.'
+                );
+            }
+        }
+    });
+})
+.catch((error) => {
+    console.error('❌ Erro ao criar cliente:', error);
+});
 
 const redirectToSpecialist = async (client, message) => {
     try {
+        console.log("🔄 Iniciando redirecionamento para especialistas...");
         const specialists = [
             { name: 'Rafael', number: '5531987952799' },
             { name: 'Bruno', number: '5531994344898' },
@@ -61,54 +85,118 @@ const redirectToSpecialist = async (client, message) => {
             { name: 'Gabriel', number: '5531999407159' },
         ];
 
-        let specialistAvailable = false;
+        // Inform user that we're looking for specialists
+        await client.sendText(
+            message.from,
+            "🔍 Estamos procurando um especialista disponível para atendê-lo. Por favor, aguarde um momento..."
+        );
+
+        let specialistFound = false;
+        const clientNumber = message.from.replace('@c.us', '');
 
         for (const specialist of specialists) {
-            // Notifica o especialista sobre a solicitação
-            await client.sendText(
-                `${specialist.number}@c.us`,
-                `👋 Olá, ${specialist.name}!\n\nUm cliente gostaria de falar com você.\n` +
-                `📞 Número do cliente: ${message.from.replace('@c.us', '')}\n\n` +
-                `Responda com *OK* se estiver disponível ou qualquer outra mensagem caso não possa atender.`
-            );
+            if (specialistFound) break;
 
+            console.log(`📩 Tentando contato com ${specialist.name}...`);
+            
             try {
-                const specialistStatus = await waitForSpecialistResponse(client, specialist.number);
+                await client.sendText(
+                    `${specialist.number}@c.us`,
+                    `👋 Olá ${specialist.name}!\n\n` +
+                    `Um cliente deseja falar com você.\n` +
+                    `📞 Número do cliente: ${clientNumber}\n\n` +
+                    `Por favor, responda:\n` +
+                    `• Digite *OK* se puder atender agora\n` +
+                    `• Digite *negativo* se não estiver disponível`
+                );
 
-                if (specialistStatus === "ok") {
-                    // Especialista está disponível
+                const response = await new Promise((resolve) => {
+                    const timeout = setTimeout(() => resolve('timeout'), 30000);
+
+                    const messageHandler = (specialistMessage) => {
+                        if (specialistMessage.from === `${specialist.number}@c.us`) {
+                            clearTimeout(timeout);
+                            const reply = specialistMessage.body.toLowerCase();
+                            
+                            if (reply === 'ok') {
+                                resolve('available');
+                            } else if (reply === 'negativo' || reply === 'não posso') {
+                                resolve('unavailable');
+                            }
+                        }
+                    };
+
+                    client.onMessage(messageHandler);
+                });
+
+                if (response === 'available') {
+                    console.log(`✅ ${specialist.name} está disponível!`);
                     await client.sendText(
                         message.from,
-                        `✅ O especialista *${specialist.name}* está disponível!\n` +
-                        `👉 Clique no link para falar com ele diretamente: https://wa.me/${specialist.number}`
+                        `✅ Ótima notícia! O especialista *${specialist.name}* irá atendê-lo.\n` +
+                        `📱 Você será conectado em instantes: https://wa.me/${specialist.number}`
                     );
-
-                    // Informa ao especialista que o cliente foi notificado
+                    specialistFound = true;
+                    break;
+                } else if (response === 'unavailable') {
+                    console.log(`❌ ${specialist.name} não está disponível.`);
                     await client.sendText(
-                        `${specialist.number}@c.us`,
-                        `🔔 Informamos ao cliente que você está disponível. Aguarde o contato do cliente no número: ${message.from.replace('@c.us', '')}.`
+                        message.from,
+                        "🔄 Especialista indisponível. Procurando outro especialista..."
                     );
-
-                    specialistAvailable = true;
-                    break; // Encerra o loop ao encontrar um especialista disponível
+                    continue;
                 } else {
-                    console.log(`Especialista ${specialist.name} não está disponível.`);
+                    console.log(`⏳ ${specialist.name} não respondeu no tempo limite.`);
+                    continue;
                 }
             } catch (error) {
-                console.log(`Especialista ${specialist.name} não respondeu a tempo.`);
+                console.error(`❌ Erro ao aguardar resposta de ${specialist.name}:`, error);
+                continue;
             }
         }
 
-        if (!specialistAvailable) {
-            // Nenhum especialista está disponível ou respondeu a tempo
+        if (!specialistFound) {
+            console.log('❌ Nenhum especialista disponível.');
             await client.sendText(
                 message.from,
-                `⚠️ No momento, nenhum especialista está disponível para atender sua solicitação.\n` +
-                `Por favor, tente novamente mais tarde ou volte ao menu principal digitando *menu*.`
+                "😔 No momento, todos os nossos especialistas estão ocupados.\n\n" +
+                "📝 Por favor, descreva sua necessidade ou dúvida em detalhes.\n" +
+                "👨‍💼 Um de nossos especialistas entrará em contato assim que possível.\n\n" +
+                "Ou se preferir:\n" +
+                "• Digite *menu* para ver outras opções de contato\n" +
+                "• Digite *agendar* para marcar uma reunião"
+            );
+
+            // Aguarda a mensagem do cliente
+            const clientResponse = await new Promise((resolve) => {
+                const messageHandler = (clientMessage) => {
+                    if (clientMessage.from === message.from) {
+                        resolve(clientMessage.body);
+                    }
+                };
+                client.onMessage(messageHandler);
+            });
+
+            // Encaminha a mensagem para todos os especialistas
+            for (const specialist of specialists) {
+                await client.sendText(
+                    `${specialist.number}@c.us`,
+                    `📋 Nova mensagem de cliente:\n\n` +
+                    `👤 Cliente: ${clientNumber}\n` +
+                    `📝 Mensagem: ${clientResponse}\n\n` +
+                    `Entre em contato assim que possível.`
+                );
+            }
+
+            await client.sendText(
+                message.from,
+                "✅ Sua mensagem foi registrada!\n" +
+                "Um especialista entrará em contato o mais breve possível.\n" +
+                "Digite *menu* para voltar ao menu principal."
             );
         }
     } catch (error) {
-        console.error("Erro ao redirecionar para especialista:", error);
+        console.error("❌ Erro ao redirecionar para especialista:", error);
         await client.sendText(
             message.from,
             "❌ Ocorreu um erro ao tentar redirecionar você. Por favor, tente novamente mais tarde."
@@ -116,25 +204,4 @@ const redirectToSpecialist = async (client, message) => {
     }
 };
 
-
-// Função auxiliar para aguardar a resposta do especialista
-const waitForSpecialistResponse = (client, specialistNumber) => {
-    return new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => {
-            reject("O especialista não respondeu a tempo.");
-        }, 30000); // Timeout de 30 segundos
-
-        client.onMessage((specialistResponse) => {
-            if (specialistResponse.from === `${specialistNumber}@c.us`) {
-                clearTimeout(timeout);
-                if (specialistResponse.body.trim().toLowerCase() === "ok") {
-                    resolve("ok");
-                } else {
-                    resolve("unavailable");
-                }
-            }
-        });
-    });
-};
-
-
+export const getQRCode = () => qrCodeData;
