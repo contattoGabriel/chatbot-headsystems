@@ -7,7 +7,7 @@ class SimpleAI {
             "🔷 Outsourcing de TI\n" +
             "🔷 Virtualização\n" +
             "🔷 Segurança da Informação\n\n" +
-            "Como posso ajudar? 😊\n\n" +
+            "Como posso ajudar?\n\n" +
             "1️⃣ 👨‍💼 Falar com um Especialista\n" +
             "2️⃣ 🔍 Conhecer Nossos Serviços\n" +
             "3️⃣ ℹ️ Perguntas Frequentes (FAQ)\n" +
