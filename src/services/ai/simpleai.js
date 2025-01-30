@@ -77,7 +77,6 @@ class SimpleAI {
                 complete: false
             };
         }
-
         if (this.awaitingSpecialist) {
             return { message: "⏳ Aguarde enquanto verificamos a disponibilidade dos especialistas...", complete: false };
         }
