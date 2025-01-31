@@ -17,8 +17,8 @@ class EmailService {
     }
 
     async sendMeetingConfirmation(meetingDetails, clientEmail) {
-        const emailBody = `
-            <h2>Confirmação de Agendamento - Head Systems</h2>
+        const emailBody =
+            `<h2>Confirmação de Agendamento - Head Systems</h2>
             <p>Olá! Seu agendamento foi confirmado com sucesso.</p>
             <p><strong>Detalhes da Reunião:</strong></p>
             <ul>
@@ -28,8 +28,7 @@ class EmailService {
             </ul>
             <p>Em caso de dúvidas, entre em contato conosco:</p>
             <p>📞 (31) 3772-0172<br>
-            📧 contato@headsystems.com.br</p>
-        `;
+            📧 contato@headsystems.com.br</p>`;
 
         try {
             await this.transporter.sendMail({
@@ -39,7 +38,7 @@ class EmailService {
                 subject: "Confirmação de Agendamento - Head Systems",
                 html: emailBody
             });
-            
+
             return true;
         } catch (error) {
             console.error('Erro ao enviar email:', error);

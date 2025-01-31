@@ -14,8 +14,8 @@ class SimpleAI {
             "4️⃣ 📅 Agendar Reunião\n" +
             "5️⃣ 📖 Sobre Nós\n" +
             "6️⃣ 📞 Contato\n" +
-            "7️⃣ 🚪 Encerrar Conversa", // Atualizado com novas opções
-        options: ['1', '2', '3', '4', '5', '6', '7'], // Opções ajustadas
+            "7️⃣ 🚪 Encerrar Conversa",
+        options: ['1', '2', '3', '4', '5', '6', '7'],
     };
 
     static servicesMenu = {
@@ -77,6 +77,7 @@ class SimpleAI {
                 complete: false
             };
         }
+
         if (this.awaitingSpecialist) {
             return { message: "⏳ Aguarde enquanto verificamos a disponibilidade dos especialistas...", complete: false };
         }
@@ -87,7 +88,7 @@ class SimpleAI {
         }
 
         if (this.state === "main") {
-            switch(text) {
+            switch (text) {
                 case '1':
                     this.awaitingSpecialist = true;
                     return { message: "🔔 Estamos verificando a disponibilidade dos especialistas. Por favor, aguarde.", complete: false };
@@ -100,24 +101,19 @@ class SimpleAI {
                 case '4':
                     this.state = "scheduling";
                     this.currentStep = 1;
-                    return { message: "📅 Por favor, informe a data desejada para a reunião (ex: 25/12/2024):", complete: false };
-                case '5': // Novo caso para "Sobre Nós"
+                    return { message: "👤 Por favor, informe seu nome completo:", complete: false };
+                case '5':
                     this.state = "about";
                     return { message: SimpleAI.aboutUsMenu.message, complete: false };
-                case '6': // Novo caso para "Contato"
+                case '6':
                     this.state = "contact";
                     return { message: SimpleAI.contactMenu.message, complete: false };
-                case '7': // Atualizado para encerrar
+                case '7':
                     this.state = "end";
                     return { message: "👋 Obrigado por conversar com a Head Systems! Se precisar de algo, digite Menu e Fale com um de nossos Especialistas. 😊", complete: false };
                 default:
                     return { message: SimpleAI.mainMenu.message, complete: false };
             }
-        }
-
-        if (this.state === "scheduling" && this.currentStep === 0) {
-            this.currentStep = 1;
-            return { message: "👤 Por favor, informe seu nome completo:", complete: false };
         }
 
         if (this.state === "scheduling") {
@@ -129,7 +125,7 @@ class SimpleAI {
     }
 
     async handleSchedulingFlow(text) {
-        switch(this.currentStep) {
+        switch (this.currentStep) {
             case 1:
                 this.schedulingData.name = text;
                 this.currentStep = 2;
@@ -164,21 +160,21 @@ class SimpleAI {
             case 5:
                 this.schedulingData.subject = text;
                 this.currentStep = 6;
-                return { 
+                return {
                     message: `📝 Confirmação de Agendamento:\n\n` +
-                             `👤 Nome: ${this.schedulingData.name}\n` +
-                             `📆 Data: ${this.schedulingData.date}\n` +
-                             `⏰ Horário: ${this.schedulingData.time}\n` +
-                             `📧 E-mail: ${this.schedulingData.email}\n` +
-                             `📝 Assunto: ${this.schedulingData.subject}\n\n` +
-                             `Digite *confirmar* para finalizar ou *cancelar* para voltar ao menu.`,
-                    complete: false 
+                        `👤 Nome: ${this.schedulingData.name}\n` +
+                        `📆 Data: ${this.schedulingData.date}\n` +
+                        `⏰ Horário: ${this.schedulingData.time}\n` +
+                        `📧 E-mail: ${this.schedulingData.email}\n` +
+                        `📝 Assunto: ${this.schedulingData.subject}\n\n` +
+                        `Digite *confirmar* para finalizar ou *cancelar* para voltar ao menu.`,
+                    complete: false
                 };
             case 6:
                 if (text.toLowerCase() === 'confirmar') {
-                    this.lastMeetingDetails = {...this.schedulingData};
+                    this.lastMeetingDetails = { ...this.schedulingData };
                     const meetingDetails = this.lastMeetingDetails;
-                    
+
                     try {
                         const emailSent = await emailService.sendMeetingConfirmation(
                             meetingDetails,
@@ -186,19 +182,19 @@ class SimpleAI {
                         );
 
                         this.resetState();
-                        
+
                         if (emailSent) {
                             return {
                                 message: "✅ Agendamento confirmado! Um email de confirmação foi enviado para você.\n" +
-                                       "Se precisar de mais alguma coisa, digite *menu* para acessar outras informações.",
+                                    "Se precisar de mais alguma coisa, digite *menu* para acessar outras informações.",
                                 complete: true,
                                 meetingDetails
                             };
                         } else {
                             return {
                                 message: "✅ Agendamento confirmado! Porém houve um erro ao enviar o email de confirmação.\n" +
-                                       "Nossa equipe entrará em contato em breve.\n" +
-                                       "Digite *menu* para acessar outras informações.",
+                                    "Nossa equipe entrará em contato em breve.\n" +
+                                    "Digite *menu* para acessar outras informações.",
                                 complete: true,
                                 meetingDetails
                             };

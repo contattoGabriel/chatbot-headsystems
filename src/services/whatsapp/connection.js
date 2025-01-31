@@ -11,6 +11,9 @@ const specialistNumbers = [
     '5531989657822'
 ];
 
+// Objeto para armazenar o estado de cada conversa
+const conversationState = {};
+
 create({
     session: 'head-systems-bot',
     multidevice: true,
@@ -24,68 +27,74 @@ create({
         qrCodeData = base64Qr;
     },
 })
-.then((client) => {
-    console.log('🚀 Bot iniciado com sucesso!');
-    const aiInstance = new SimpleAI();
-    
-    client.onMessage(async (message) => {
-        if (!message.isGroupMsg) {
-            try {
-                // Skip messages from specialists completely
-                if (specialistNumbers.includes(message.from.replace('@c.us', ''))) {
-                    return;
-                }
+    .then((client) => {
+        console.log('🚀 Bot iniciado com sucesso!');
 
-                if (!message.body || typeof message.body !== 'string') {
-                    console.log('❌ Mensagem inválida recebida');
-                    return;
-                }
+        client.onMessage(async (message) => {
+            if (!message.isGroupMsg) {
+                try {
+                    // Skip messages from specialists completely
+                    if (specialistNumbers.includes(message.from.replace('@c.us', ''))) {
+                        return;
+                    }
 
-                console.log(`📩 Mensagem recebida de cliente: ${message.body}`);
-                const userInput = message.body.trim();
+                    if (!message.body || typeof message.body !== 'string') {
+                        console.log('❌ Mensagem inválida recebida');
+                        return;
+                    }
 
-                if (!userInput) {
-                    console.log('❌ Mensagem vazia recebida');
-                    return;
-                }
+                    console.log(`📩 Mensagem recebida de cliente: ${message.body}`);
+                    const userInput = message.body.trim();
 
-                const response = await aiInstance.processMessage(userInput);
+                    if (!userInput) {
+                        console.log('❌ Mensagem vazia recebida');
+                        return;
+                    }
 
-                if (aiInstance.awaitingSpecialist) {
-                    await handleSpecialistSearch(client, message);
-                    aiInstance.awaitingSpecialist = false; // Reiniciar o estado
-                    return;
-                }
+                    // Inicializa o estado da conversa se não existir
+                    if (!conversationState[message.from]) {
+                        conversationState[message.from] = {
+                            aiInstance: new SimpleAI(),
+                        };
+                    }
 
-                // Update admin notification message
-                if (response.complete && response.meetingDetails) {
-                    await client.sendText(message.from, response.message);
+                    const response = await conversationState[message.from].aiInstance.processMessage(userInput);
+
+                    if (conversationState[message.from].aiInstance.awaitingSpecialist) {
+                        await handleSpecialistSearch(client, message);
+                        conversationState[message.from].aiInstance.awaitingSpecialist = false; // Reiniciar o estado
+                        return;
+                    }
+
+                    // Update admin notification message
+                    if (response.complete && response.meetingDetails) {
+                        await client.sendText(message.from, response.message);
+                        await client.sendText(
+                            ADMIN_NUMBER,
+                            `📅 Novo agendamento de reunião:\n\n` +
+                            `👤 Nome: ${response.meetingDetails.name}\n` +
+                            `📆 Data: ${response.meetingDetails.date}\n` +
+                            `⏰ Hora: ${response.meetingDetails.time}\n` +
+                            `📧 E-mail: ${response.meetingDetails.email}\n` +
+                            `📝 Assunto: ${response.meetingDetails.subject}\n` +
+                            `📞 Número do cliente: ${message.from.replace('@c.us', '')}`
+                        );
+                    } else {
+                        await client.sendText(message.from, response.message);
+                    }
+                } catch (error) {
+                    console.error('❌ Erro ao processar mensagem:', error);
                     await client.sendText(
-                        ADMIN_NUMBER,
-                        `📅 Novo agendamento de reunião:\n\n` +
-                        `👤 Nome: ${response.meetingDetails.name}\n` +
-                        `📆 Data: ${response.meetingDetails.date}\n` +
-                        `⏰ Hora: ${response.meetingDetails.time}\n` +
-                        `📧 E-mail: ${response.meetingDetails.email}\n` +
-                        `📝 Assunto: ${response.meetingDetails.subject}\n` +
-                        `📞 Número do cliente: ${message.from.replace('@c.us', '')}`
+                        message.from,
+                        '⚠️ Ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.'
                     );
-                } else {
-                    await client.sendText(message.from, response.message);
                 }
-            } catch (error) {
-                console.error('❌ Erro ao processar mensagem:', error);
-                await client.sendText(
-                    message.from,
-                    '⚠️ Ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.'
-                );
             }
-        }
+        });
+    })
+    .catch((error) => {
+        console.error('❌ Erro ao criar cliente:', error);
     });
-})
-.catch((error) => {
-    console.error('❌ Erro ao criar cliente:', error);
-});
 
 const handleSpecialistSearch = async (client, message) => {
     try {
