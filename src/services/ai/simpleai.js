@@ -1,29 +1,48 @@
 import emailService from '../email/mailservice.js';
 
 class SimpleAI {
+    static lgpdTerms = {
+        message: "📜 *Termos de Uso - LGPD*\n\n" +
+            "Antes de continuar, precisamos que você concorde com:\n\n" +
+            "1. Coletaremos apenas dados necessários para o atendimento\n" +
+            "2. Seus dados serão armazenados com segurança\n" +
+            "3. Você pode solicitar exclusão a qualquer momento\n\n" +
+            "Digite *\"aceitar\"* para concordar e continuar.",
+        options: ['aceitar'],
+    };
+
     static mainMenu = {
-        message: "👋 Olá, sou o assistente virtual da *Head Systems*! 🚀\n\n" +
-            "💼 Somos especialistas em:\n" +
-            "🔷 Outsourcing de TI\n" +
-            "🔷 Virtualização\n" +
-            "🔷 Segurança da Informação\n\n" +
-            "Como posso ajudar?\n\n" +
-            "1️⃣ 👨‍💼 Falar com um Especialista\n" +
-            "2️⃣ 🔍 Conhecer Nossos Serviços\n" +
-            "3️⃣ ℹ️ Perguntas Frequentes (FAQ)\n" +
-            "4️⃣ 📅 Agendar Reunião\n" +
-            "5️⃣ 📖 Sobre Nós\n" +
-            "6️⃣ 📞 Contato\n" +
-            "7️⃣ 🚪 Encerrar Conversa",
+        message: "👋 *Bem-vindo(a) à Head Systems!* 🚀\n" +
+            "*Soluções inovadoras em TI para transformar seu negócio!*\n\n" +
+            
+            "✨ *Nossas Especialidades:*\n" +
+            "▫️ Gestão Completa de TI\n" +
+            "▫️ Virtualização de Servidores/Desktops\n" +
+            "▫️ Segurança Cibernética\n" +
+            "▫️ Gerenciamento de Dispositivos (MDM)\n" +
+            "▫️ Infraestrutura em Nuvem\n\n" +
+            
+            "📌 *Como posso ajudar?*\n\n" +
+            "👉 1️⃣ `Falar com especialista`\n" +
+            "👉 2️⃣ `Serviços` - Conhecer detalhes\n" +
+            "👉 3️⃣ `FAQ` - Tire dúvidas rápidas\n" +
+            "👉 4️⃣ `Agendar`- Reunião técnica\n" +
+            "👉 5️⃣ `Sobre` - Nossa história\n" +
+            "👉 6️⃣ `Contato` - Canais diretos\n" +
+            "👉 7️⃣ `Sair` - Encerrar atendimento\n\n",
+            
         options: ['1', '2', '3', '4', '5', '6', '7'],
     };
 
     static servicesMenu = {
         message: "🏢 Aqui estão os principais serviços que a *Head Systems* oferece:\n\n" +
-            "🔹 *Outsourcing de TI*: Gestão completa de TI e suporte especializado.\n" +
-            "🔹 *Virtualização*: Soluções Citrix, Microsoft e VMware para reduzir custos.\n" +
-            "🔹 *Segurança da Informação*: Firewall, backup e conformidade LGPD.\n" +
-            "🔹 *Pulsus MDM*: Monitoramento completo de dispositivos móveis e gerenciamento de dispositivos corporativos.\n\n" +
+            "🔹 *Gestão Completa de TI*: Suporte técnico especializado e administração de infraestrutura de TI.\n" +
+            "🔹 *Virtualização de Servidores e Desktops*: Soluções para otimização de recursos e redução de custos.\n" +
+            "🔹 *Segurança da Informação*: Proteção de dados, backup gerenciado e conformidade com a LGPD.\n" +
+            "🔹 *Gerenciamento de Dispositivos Móveis*: Monitoramento e controle de dispositivos corporativos.\n" +
+            "🔹 *Cloud Computing*: Soluções em nuvem para escalabilidade e flexibilidade.\n" +
+            "🔹 *Consultoria em TI*: Planejamento estratégico e implementação de soluções tecnológicas.\n" +
+            "🔹 *Infraestrutura de Redes*: Projetos, implantação e manutenção de redes corporativas.\n\n" +
             "Digite *menu* para voltar ao início.",
         options: ['menu'],
     };
@@ -32,8 +51,9 @@ class SimpleAI {
         message: "ℹ️ *Perguntas Frequentes (FAQ)*:\n\n" +
             "Como funciona o suporte de TI?\n" +
             "Quais benefícios das soluções de virtualização?\n" +
-            "Como a Head Systems ajuda com a LGPD?\n\n" +
-            "Digite *menu* para voltar ao início.",
+            "Como a Head Systems ajuda com a LGPD?\n" +
+            "Digite *menu* para voltar ao início.\n" +
+            "Para saber todas essas informações, acesse nosso site: https://headsystems.com.br\n\n",
         options: ['menu'],
     };
 
@@ -54,193 +74,184 @@ class SimpleAI {
     };
 
     constructor() {
-        this.state = "main";
+        this.state = "welcome"; // Estado inicial: mensagem de boas-vindas
         this.schedulingData = {};
         this.currentStep = 0;
         this.lastMeetingDetails = null;
         this.awaitingSpecialist = false;
+        this.termsAccepted = false; // Flag de aceitação dos termos
     }
 
     processMessage(message) {
         if (!message || typeof message !== 'string') {
-            return {
-                message: "❌ Mensagem inválida. Por favor, tente novamente.",
-                complete: false
-            };
+            return { message: "❌ Mensagem inválida. Por favor, tente novamente.", complete: false };
         }
 
         const text = message.toLowerCase().trim();
 
-        if (!text) {
-            return {
-                message: SimpleAI.mainMenu.message,
+        // Handle global 'menu' command
+        if (text === 'menu') {
+            this.resetState();
+            return { message: SimpleAI.mainMenu.message, complete: false };
+        }
+
+        // Caso o usuário não envie texto válido
+        if (!text) return { message: this.getCurrentStateMessage(), complete: false };
+
+        // Fluxo principal
+        switch (this.state) {
+            case "welcome":
+                return this.handleWelcomeFlow(text);
+            case "terms":
+                return this.handleLGPDTerms(text);
+            case "main":
+                return this.handleMainFlow(text);
+            case "scheduling":
+                return this.handleSchedulingFlow(text);
+            default:
+                return { message: "❌ Erro no fluxo. Digite *menu*.", complete: false };
+        }
+    }
+
+    // ======================================
+    // Fluxo de Boas-Vindas
+    // ======================================
+    handleWelcomeFlow(text) {
+        if (text === "iniciar") {
+            this.state = "terms";
+            return { 
+                message: SimpleAI.lgpdTerms.message, 
+                complete: false 
+            };
+        } else {
+            return { 
+                message: "👋 Olá! Eu sou o assistente virtual da *Head Systems*.\n\n" +
+                    "Antes de começarmos, digite *\"iniciar\"* para prosseguir.",
                 complete: false
             };
         }
+    }
 
-        if (this.awaitingSpecialist) {
-            return { message: "⏳ Aguarde enquanto verificamos a disponibilidade dos especialistas...", complete: false };
+    // ======================================
+    // Fluxo de Aceitação dos Termos LGPD
+    // ======================================
+    handleLGPDTerms(text) {
+        if (text === "aceitar") {
+            this.termsAccepted = true;
+            this.state = "main";
+            return { 
+                message: "✅ Termos aceitos! Como posso ajudar?\n\n" + SimpleAI.mainMenu.message, 
+                complete: false 
+            };
+        } else {
+            return { 
+                message: "❌ Você precisa aceitar os termos para continuar. Digite *\"aceitar\"*.",
+                complete: false
+            };
         }
+    }
 
+    // ======================================
+    // Fluxo Principal do Chatbot
+    // ======================================
+    handleMainFlow(text) {
         if (text === "menu") {
             this.resetState();
             return { message: SimpleAI.mainMenu.message, complete: false };
         }
 
-        if (this.state === "main") {
-            switch (text) {
-                case '1':
-                    this.awaitingSpecialist = true;
-                    return { message: "🔔 Estamos verificando a disponibilidade dos especialistas. Por favor, aguarde.", complete: false };
-                case '2':
-                    this.state = "services";
-                    return { message: SimpleAI.servicesMenu.message, complete: false };
-                case '3':
-                    this.state = "faq";
-                    return { message: SimpleAI.faqMenu.message, complete: false };
-                case '4':
-                    this.state = "scheduling";
-                    this.currentStep = 1;
-                    return { message: "👤 Por favor, informe seu nome completo:", complete: false };
-                case '5':
-                    this.state = "about";
-                    return { message: SimpleAI.aboutUsMenu.message, complete: false };
-                case '6':
-                    this.state = "contact";
-                    return { message: SimpleAI.contactMenu.message, complete: false };
-                case '7':
-                    this.state = "end";
-                    return { message: "👋 Obrigado por conversar com a Head Systems! Se precisar de algo, digite Menu e Fale com um de nossos Especialistas. 😊", complete: false };
-                default:
-                    return { message: SimpleAI.mainMenu.message, complete: false };
-            }
+        switch (text) {
+            case '1':
+                this.awaitingSpecialist = true;
+                return { message: "🔔 Buscando especialistas disponíveis...", complete: false };
+            case '2':
+                this.state = "services";
+                return { message: SimpleAI.servicesMenu.message, complete: false };
+            case '3':
+                this.state = "faq";
+                return { message: SimpleAI.faqMenu.message, complete: false };
+            case '4':
+                this.state = "scheduling";
+                this.currentStep = 1;
+                return { message: "👤 Por favor, informe seu nome completo:", complete: false };
+            case '5':
+                this.state = "about";
+                return { message: SimpleAI.aboutUsMenu.message, complete: false };
+            case '6':
+                this.state = "contact";
+                return { message: SimpleAI.contactMenu.message, complete: false };
+            case '7':
+                this.resetState();
+                return { message: "👋 Atendimento encerrado. Volte sempre!", complete: false };
+            default:
+                return { message: SimpleAI.mainMenu.message, complete: false };
         }
-
-        if (this.state === "scheduling") {
-            return this.handleSchedulingFlow(text);
-        }
-
-        // Caso o usuário esteja em outros estados (como "about" ou "contact")
-        return { message: "❌ Opção inválida. Digite 'menu' para voltar ao início.", complete: false };
     }
 
+    // ======================================
+    // Fluxo de Agendamento
+    // ======================================
     async handleSchedulingFlow(text) {
         switch (this.currentStep) {
-            case 1:
+            case 1: // Nome
                 this.schedulingData.name = text;
                 this.currentStep = 2;
-                return { message: "📅 Por favor, informe a data desejada para a reunião (ex: 25/12/2024):", complete: false };
-            case 2:
+                return { message: "📅 Informe a data (DD/MM/AAAA):", complete: false };
+            
+            case 2: // Data
                 if (!this.isValidDate(text)) {
-                    return { message: "❌ Data inválida. Por favor, informe no formato correto (ex: 25/12/2024):", complete: false };
-                }
-                if (!this.isFutureDate(text)) {
-                    return { message: "❌ A data deve ser posterior ao dia atual. Por favor, informe uma data válida:", complete: false };
+                    return { message: "❌ Formato inválido. Use DD/MM/AAAA:", complete: false };
                 }
                 this.schedulingData.date = text;
                 this.currentStep = 3;
-                return { message: "⏰ Agora, informe o horário desejado (ex: 14:30):", complete: false };
-            case 3:
+                return { message: "⏰ Informe o horário (HH:MM):", complete: false };
+            
+            case 3: // Horário
                 if (!this.isValidTime(text)) {
-                    return { message: "❌ Horário inválido. Informe um horário válido (ex: 14:30):", complete: false };
-                }
-                if (!this.isValidDateTime(this.schedulingData.date, text)) {
-                    return { message: "❌ O horário deve ser posterior ao horário atual para hoje. Por favor, informe um horário válido:", complete: false };
+                    return { message: "❌ Horário inválido. Use HH:MM:", complete: false };
                 }
                 this.schedulingData.time = text;
                 this.currentStep = 4;
-                return { message: "📧 Informe seu e-mail para confirmação:", complete: false };
-            case 4:
+                return { message: "📧 Informe seu e-mail:", complete: false };
+            
+            case 4: // E-mail
                 if (!this.isValidEmail(text)) {
-                    return { message: "❌ E-mail inválido. Informe um e-mail válido:", complete: false };
+                    return { message: "❌ E-mail inválido. Tente novamente:", complete: false };
                 }
                 this.schedulingData.email = text;
                 this.currentStep = 5;
-                return { message: "📝 Informe o assunto da reunião:", complete: false };
-            case 5:
+                return { message: "📝 Descreva o assunto da reunião:", complete: false };
+            
+            case 5: // Confirmação
                 this.schedulingData.subject = text;
-                this.currentStep = 6;
-                return {
-                    message: `📝 Confirmação de Agendamento:\n\n` +
-                        `👤 Nome: ${this.schedulingData.name}\n` +
-                        `📆 Data: ${this.schedulingData.date}\n` +
-                        `⏰ Horário: ${this.schedulingData.time}\n` +
-                        `📧 E-mail: ${this.schedulingData.email}\n` +
-                        `📝 Assunto: ${this.schedulingData.subject}\n\n` +
-                        `Digite *confirmar* para finalizar ou *cancelar* para voltar ao menu.`,
-                    complete: false
-                };
-            case 6:
-                if (text.toLowerCase() === 'confirmar') {
-                    this.lastMeetingDetails = { ...this.schedulingData };
-                    const meetingDetails = this.lastMeetingDetails;
-
-                    try {
-                        const emailSent = await emailService.sendMeetingConfirmation(
-                            meetingDetails,
-                            meetingDetails.email
-                        );
-
-                        this.resetState();
-
-                        if (emailSent) {
-                            return {
-                                message: "✅ Agendamento confirmado! Um email de confirmação foi enviado para você.\n" +
-                                    "Se precisar de mais alguma coisa, digite *menu* para acessar outras informações.",
-                                complete: true,
-                                meetingDetails
-                            };
-                        } else {
-                            return {
-                                message: "✅ Agendamento confirmado! Porém houve um erro ao enviar o email de confirmação.\n" +
-                                    "Nossa equipe entrará em contato em breve.\n" +
-                                    "Digite *menu* para acessar outras informações.",
-                                complete: true,
-                                meetingDetails
-                            };
-                        }
-                    } catch (error) {
-                        console.error('Erro no agendamento:', error);
-                        return {
-                            message: "❌ Ocorreu um erro ao confirmar o agendamento. Por favor, tente novamente.",
-                            complete: false
-                        };
-                    }
-                } else if (text.toLowerCase() === 'cancelar') {
-                    this.resetState();
-                    return {
-                        message: SimpleAI.mainMenu.message,
-                        complete: false
-                    };
-                }
-                return {
-                    message: "❌ Opção inválida. Digite *confirmar* ou *cancelar*.",
-                    complete: false
-                };
+                return this.confirmScheduling();
+            
             default:
-                return {
-                    message: "❌ Erro no fluxo de agendamento. Digite *menu* para recomeçar.",
-                    complete: false
-                };
+                this.resetState();
+                return { message: "❌ Erro no agendamento. Digite *menu*.", complete: false };
         }
     }
 
-    isFutureDate(dateStr) {
-        const [day, month, year] = dateStr.split('/').map(Number);
-        const inputDate = new Date(year, month - 1, day);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        return inputDate >= today;
+    async confirmScheduling() {
+        try {
+            await emailService.sendMeetingConfirmation(this.schedulingData, this.schedulingData.email);
+            this.lastMeetingDetails = { ...this.schedulingData };
+            this.resetState();
+            
+            return {
+                message: "✅ Agendamento confirmado! Detalhes enviados por e-mail.",
+                complete: true,
+                meetingDetails: this.lastMeetingDetails
+            };
+        } catch (error) {
+            console.error("Erro no agendamento:", error);
+            return { message: "❌ Falha ao confirmar. Tente novamente.", complete: false };
+        }
     }
 
-    isValidDateTime(dateStr, timeStr) {
-        const [day, month, year] = dateStr.split('/').map(Number);
-        const [hours, minutes] = timeStr.split(':').map(Number);
-        const inputDateTime = new Date(year, month - 1, day, hours, minutes);
-        const now = new Date();
-        return inputDateTime > now;
-    }
-
+    // ======================================
+    // Utilitários
+    // ======================================
     isValidDate(date) {
         return /^\d{2}\/\d{2}\/\d{4}$/.test(date);
     }
@@ -258,6 +269,7 @@ class SimpleAI {
         this.currentStep = 0;
         this.schedulingData = {};
         this.awaitingSpecialist = false;
+        this.termsAccepted = false; // Reset terms acceptance
     }
 }
 

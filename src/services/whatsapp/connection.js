@@ -1,7 +1,7 @@
 import { create } from 'venom-bot';
 import SimpleAI from '../ai/simpleai.js';
 
-const ADMIN_NUMBER = '5531999407159@c.us';
+const ADMIN_NUMBER = '5531991855597@c.us';
 let qrCodeData = null;
 
 const specialistNumbers = [
@@ -113,8 +113,8 @@ const handleSpecialistSearch = async (client, message) => {
             "✅ Notificamos nossos especialistas sobre seu contato.\n" +
             "Em breve, um deles entrará em contato com você.\n\n" +
             "Enquanto isso, você pode:\n" +
-            " Aguardar o retorno\n" +
-            "Agendar uma reunião (digite *menu* e escolha opção 4)\n" +
+            "Aguardar o retorno\n" +
+            "Agendar uma reunião (digite *4*)\n" +
             "Abrir um chamado: https://helpdesk.headsystems.com.br:444/"
         );
 
