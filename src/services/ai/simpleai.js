@@ -2,20 +2,50 @@ import emailService from '../email/mailservice.js';
 
 class SimpleAI {
     static lgpdTerms = {
-        message: "📜 *Termos de Uso - LGPD*\n\n" +
-            "Antes de continuar, precisamos que você concorde com:\n\n" +
-            "1. Coletaremos apenas dados necessários para o atendimento\n" +
-            "2. Seus dados serão armazenados com segurança\n" +
-            "3. Você pode solicitar exclusão a qualquer momento\n\n" +
+        message: "📜 *Termo de Consentimento para Uso de Chatbot - Head Systems*\n\n" +
+            "1. **Introdução**\n" +
+            "Este Termo de Consentimento tem como objetivo esclarecer os direitos e responsabilidades dos usuários ao interagir com o chatbot da Head Systems, em conformidade com a Lei Geral de Proteção de Dados Pessoais (LGPD - Lei nº 13.709/2018).\n\n" +
+            "2. **Coleta e Tratamento de Dados**\n" +
+            "Ao utilizar o chatbot da Head Systems, o usuário declara estar ciente de que alguns dados pessoais podem ser coletados, incluindo, mas não se limitando a:\n" +
+            "- Nome completo;\n" +
+            "- Endereço de e-mail;\n" +
+            "- Número de telefone;\n" +
+            "- Outras informações fornecidas voluntariamente pelo usuário durante a interação.\n\n" +
+            "Os dados coletados serão utilizados exclusivamente para:\n" +
+            "- Melhorar a experiência do usuário no atendimento;\n" +
+            "- Fornecer respostas adequadas e personalizadas;\n" +
+            "- Atendimento e suporte técnico;\n" +
+            "- Análise e melhoria dos serviços prestados.\n\n" +
+            "3. **Compartilhamento de Dados**\n" +
+            "A Head Systems não venderá, cederá ou compartilhará os dados coletados com terceiros sem o devido consentimento, salvo nos seguintes casos:\n" +
+            "- Quando exigido por lei ou ordem judicial;\n" +
+            "- Para cumprimento de obrigações legais e regulatórias;\n" +
+            "- Com prestadores de serviço necessários para o funcionamento do chatbot, que também estarão sujeitos à LGPD.\n\n" +
+            "4. **Armazenamento e Segurança**\n" +
+            "Os dados serão armazenados de maneira segura, seguindo padrões adequados de proteção contra acessos não autorizados, vazamentos ou outros incidentes de segurança.\n\n" +
+            "5. **Direitos do Usuário**\n" +
+            "Nos termos da LGPD, o usuário tem direito a:\n" +
+            "- Confirmar a existência de tratamento de dados pessoais;\n" +
+            "- Acessar seus dados pessoais armazenados;\n" +
+            "- Solicitar a correção de dados incompletos, inexatos ou desatualizados;\n" +
+            "- Requerer a exclusão dos seus dados pessoais, salvo quando houver necessidade de retenção por motivos legais;\n" +
+            "- Revogar este consentimento a qualquer momento.\n\n" +
+            "Para exercer esses direitos, o usuário pode entrar em contato pelo e-mail [inserir e-mail de contato da Head Systems].\n\n" +
+            "6. **Consentimento**\n" +
+            "Ao utilizar o chatbot da Head Systems, o usuário declara estar ciente e de acordo com os termos estabelecidos neste documento. Caso não concorde com o tratamento de seus dados, o usuário pode optar por não utilizar o serviço.\n\n" +
+            "7. **Alterações no Termo de Consentimento**\n" +
+            "A Head Systems reserva-se o direito de atualizar este termo sempre que necessário para manter a conformidade com a legislação vigente. O usuário será informado sobre alterações relevantes.\n\n" +
+            "8. **Contato**\n" +
+            "Para dúvidas, solicitações ou reclamações relacionadas ao tratamento de dados pessoais, o usuário pode entrar em contato pelo e-mail [inserir e-mail de contato da Head Systems].\n\n" +
             "Digite *\"aceitar\"* para concordar e continuar.",
         options: ['aceitar'],
     };
 
     static mainMenu = {
-        message: "👋 *Bem-vindo(a) à Head Systems!* 🚀\n" +
+        message: "👋 *Bem-vindo(a) à Head Systems!* \n" +
             "*Soluções inovadoras em TI para transformar seu negócio!*\n\n" +
             
-            "✨ *Nossas Especialidades:*\n" +
+            "*Nossas Especialidades:*\n" +
             "▫️ Gestão Completa de TI\n" +
             "▫️ Virtualização de Servidores/Desktops\n" +
             "▫️ Segurança Cibernética\n" +
@@ -23,13 +53,14 @@ class SimpleAI {
             "▫️ Infraestrutura em Nuvem\n\n" +
             
             "📌 *Como posso ajudar?*\n\n" +
-            "👉 1️⃣ `Falar com especialista`\n" +
-            "👉 2️⃣ `Serviços` - Conhecer detalhes\n" +
-            "👉 3️⃣ `FAQ` - Tire dúvidas rápidas\n" +
-            "👉 4️⃣ `Agendar`- Reunião técnica\n" +
-            "👉 5️⃣ `Sobre` - Nossa história\n" +
-            "👉 6️⃣ `Contato` - Canais diretos\n" +
-            "👉 7️⃣ `Sair` - Encerrar atendimento\n\n",
+            " 1️⃣ `Falar com especialista`- *Time Head*\n" +
+            " 2️⃣ `Serviços`- *Conhecer detalhes*\n" +
+            " 3️⃣ `FAQ`- *Tire dúvidas rápidas*\n" +
+            " 4️⃣ `Agendar`- *Reunião técnica*\n" +
+            " 5️⃣ `Sobre`- *Nossa história*\n" +
+            " 6️⃣ `Contato`- *Canais diretos*\n" +
+            " 7️⃣ `Sair`- *Encerrar atendimento*\n\n" +
+            "🔢 *Digite o número correspondente à opção desejada:*",
             
         options: ['1', '2', '3', '4', '5', '6', '7'],
     };
@@ -173,7 +204,7 @@ class SimpleAI {
             case '4':
                 this.state = "scheduling";
                 this.currentStep = 1;
-                return { message: "👤 Por favor, informe seu nome completo:", complete: false };
+                return { message: "👤 Por favor, informe seu nome completo:\n\n Ou Digite *Menu* para voltar ao Menu Principal.", complete: false };
             case '5':
                 this.state = "about";
                 return { message: SimpleAI.aboutUsMenu.message, complete: false };
