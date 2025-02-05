@@ -30,15 +30,15 @@ class SimpleAI {
             "- Solicitar a correção de dados incompletos, inexatos ou desatualizados;\n" +
             "- Requerer a exclusão dos seus dados pessoais, salvo quando houver necessidade de retenção por motivos legais;\n" +
             "- Revogar este consentimento a qualquer momento.\n\n" +
-            "Para exercer esses direitos, o usuário pode entrar em contato pelo e-mail [inserir e-mail de contato da Head Systems].\n\n" +
+            "Para exercer esses direitos, o usuário pode entrar em contato pelo e-mail [contato@headsystems.com.br].\n\n" +
             "6. **Consentimento**\n" +
             "Ao utilizar o chatbot da Head Systems, o usuário declara estar ciente e de acordo com os termos estabelecidos neste documento. Caso não concorde com o tratamento de seus dados, o usuário pode optar por não utilizar o serviço.\n\n" +
             "7. **Alterações no Termo de Consentimento**\n" +
             "A Head Systems reserva-se o direito de atualizar este termo sempre que necessário para manter a conformidade com a legislação vigente. O usuário será informado sobre alterações relevantes.\n\n" +
             "8. **Contato**\n" +
-            "Para dúvidas, solicitações ou reclamações relacionadas ao tratamento de dados pessoais, o usuário pode entrar em contato pelo e-mail [inserir e-mail de contato da Head Systems].\n\n" +
-            "Digite *\"aceitar\"* para concordar e continuar.",
-        options: ['aceitar'],
+            "Para dúvidas, solicitações ou reclamações relacionadas ao tratamento de dados pessoais, o usuário pode entrar em contato pelo e-mail [contato@headsystems.com.br].\n\n" +
+            "Digite *\"ACEITAR\"* para concordar e continuar.",
+        options: ['ACEITAR'],
     };
 
     static mainMenu = {
