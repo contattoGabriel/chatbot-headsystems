@@ -1,7 +1,7 @@
 import { create } from 'venom-bot';
 import SimpleAI from '../ai/simpleai.js';
 
-const ADMIN_NUMBER = '5531991855597@c.us';
+const ADMIN_NUMBER = '5531999407159@c.us';
 let qrCodeData = null;
 
 const specialistNumbers = [
