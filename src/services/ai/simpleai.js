@@ -270,7 +270,7 @@ class SimpleAI {
             this.resetState();
             
             return {
-                message: "✅ Agendamento confirmado! Detalhes enviados por e-mail.",
+                message: "✅ Agendamento confirmado! Sua reunião foi marcada com sucesso e enviada para o Gestor de TI." ,
                 complete: true,
                 meetingDetails: this.lastMeetingDetails
             };
