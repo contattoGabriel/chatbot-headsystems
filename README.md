@@ -26,7 +26,6 @@ Este é um projeto de chatbot desenvolvido para a empresa **Head Systems**, com 
 
 ## 📂 Estrutura do Projeto
 
-
 ## 🚀 Como Executar o Projeto
 
 ### Pré-requisitos
@@ -38,6 +37,43 @@ Este é um projeto de chatbot desenvolvido para a empresa **Head Systems**, com 
 ### Passos
 
 1. **Clone o repositório**:
+
    ```bash
    git clone https://github.com/seu-usuario/chatbot-headsystems.git
    cd chatbot-headsystems
+
+   chatbot-headsystems/ ├── .env # Variáveis de ambiente ├── .gitignore # Arquivos ignorados pelo Git ├── package.json # Configuração do projeto Node.js ├── README.md # Documentação do projeto ├── script.js # Scripts relacionados à autenticação OAuth2 ├── src/ │ ├── app.js # Arquivo principal do servidor │ ├── config/ │ │ └── database.js # Configuração do banco de dados │ ├── controllers/ │ │ └── chatController.js # Lógica de processamento de mensagens │ ├── models/ │ │ ├── Chat.js # Modelo de chat │ │ └── User.js # Modelo de usuário │ ├── routes/ │ │ ├── chatRouter.js # Rotas relacionadas ao chat │ │ └── whatsappRouter.js # Rotas relacionadas ao WhatsApp │ ├── services/ │ ├── ai/ │ │ ├── openai.js # Integração com OpenAI │ │ └── simpleai.js # Lógica de IA personalizada │ ├── email/ │ │ └── mailservice.js # Serviço de envio de e-mails │ └── whatsapp/ │ └── connection.js # Integração com WhatsApp └── tokens/ # Tokens e dados de sessão do WhatsApp# ChatBot HeadSystems - Estrutura do Projeto
+   ```
+
+📂 **Estrutura de Diretórios**  
+Abaixo está a organização do projeto:
+
+```plaintext
+chatbot-headsystems/
+├── .env                   # Variáveis de ambiente
+├── .gitignore             # Arquivos ignorados pelo Git
+├── package.json           # Configuração do projeto Node.js
+├── README.md              # Documentação do projeto
+├── script.js              # Scripts de autenticação OAuth2
+├── src/
+│   ├── app.js             # Servidor principal
+│   ├── config/
+│   │   └── database.js    # Configuração do banco de dados
+│   ├── controllers/
+│   │   └── chatController.js  # Lógica de processamento de mensagens
+│   ├── models/
+│   │   ├── Chat.js        # Modelo de chat
+│   │   └── User.js        # Modelo de usuário
+│   ├── routes/
+│   │   ├── chatRouter.js       # Rotas do chat
+│   │   └── whatsappRouter.js   # Rotas do WhatsApp
+│   ├── services/
+│   │   ├── ai/
+│   │   │   ├── openai.js      # Integração com OpenAI
+│   │   │   └── simpleai.js    # IA personalizada
+│   │   ├── email/
+│   │   │   └── mailservice.js # Serviço de e-mails
+│   │   └── whatsapp/
+│   │       └── connection.js  # Conexão com WhatsApp
+└── tokens/                # Armazena tokens/sessões do WhatsApp
+```
